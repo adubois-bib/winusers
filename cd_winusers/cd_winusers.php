@@ -33,6 +33,7 @@
 						'Last logon' => 'lastlogon',
 						'Description' => 'description',
 						'Status' => 'status',
+						'GPO Groups' => 'gpogroups',
 						'Change Password' => 'usermaychangepwd',
 						'Password expires' => 'passwordexpires',
 						'Sid' => 'sid',

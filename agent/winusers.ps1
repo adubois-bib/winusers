@@ -49,6 +49,26 @@ function Get-AdSid
 	return ""
 }
 
+#Function to retrieve User's GPOs
+function Get-GPO-For-Specific-User
+{
+	param([string] $username)
+	$gpoOfUser=""
+
+	foreach ($localgroup in Get-LocalGroup) {
+        $group = Get-LocalGroupMember -SID $localgroup.SID -ErrorAction SilentlyContinue
+
+        foreach ($user in $group) {
+            $name = $user.name -split "\\"
+	    	if($name[1] -eq $username){
+			$gpoOfUser += $localgroup.Name + "; "
+		}
+
+        }
+    }
+    return $gpoOfUser;
+
+}
 #################################
 #          Local User           #
 #################################
@@ -63,6 +83,7 @@ foreach ($user in $users) {
 	if($user.Name -ne $null){
 	
 		$userType = Get-AdminUser $user.Name
+		$gpos = Get-GPO-For-Specific-User $user.Name
 		$path = "C:\Users\"+ $user.Name
 		$folderSize = Get-Size $path
 		if($user.Enabled -ne "False") { $userStatus = "Disabled" } else { $userStatus = "Enabled" }
@@ -95,6 +116,7 @@ foreach ($user in $users) {
 		$xml += "<STATUS>"+ $userStatus +"</STATUS>`n"
 		$xml += "<USERMAYCHANGEPWD>"+ $user.UserMayChangePassword +"</USERMAYCHANGEPWD>`n"
 		$xml += "<PASSWORDEXPIRES>"+ $user.PasswordExpires +"</PASSWORDEXPIRES>`n"
+		$xml += "<GPOGROUPS>"+ $gpos +"</GPOGROUPS>`n"
 		$xml += "<SID>"+ $user.SID +"</SID>`n"
 		$xml += "<USERCONNECTION>"+ $numberConnexion +"</USERCONNECTION>`n"
 		$xml += "<NUMBERREMOTECONNECTION>"+ $numberRemoteConnexion +"</NUMBERREMOTECONNECTION>`n"
